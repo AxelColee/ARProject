@@ -7,25 +7,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import javax.swing.text.AbstractDocument.BranchElement;
-
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
+import httpserver.itf.HttpRicmletRequest;
+import httpserver.itf.HttpSession;
 
-/*
- 
-
-    This class allows to build an object representing an HTTP static request*/
-
-public class HttpStaticRequest extends HttpRequest {
-    static final String DEFAULT_FILE = "index.html";
-    static final String DEFAULT_PATH = "ricm.web.GIVEN/";
-
-    public HttpStaticRequest(HttpServer hs, String method, String ressname) throws IOException {
-        super(hs, method, ressname);
+public class HttpRicmletRequestImpl extends HttpRicmletRequest{
+	
+	static final String DEFAULT_PATH = "ricm.web.GIVEN/";
+	
+	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
+        super(hs, method, ressname, br);
+        
     }
 
-    public void process(HttpResponse resp) throws Exception {
+	@Override
+	public void process(HttpResponse resp) throws Exception {
         try {
             String resname = super.getContentType(this.m_ressname);
             resp.setReplyOk();
@@ -40,5 +37,23 @@ public class HttpStaticRequest extends HttpRequest {
         }
 
     }
+
+	@Override
+	public HttpSession getSession() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getArg(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getCookie(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
