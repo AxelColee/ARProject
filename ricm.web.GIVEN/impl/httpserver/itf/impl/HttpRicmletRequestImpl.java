@@ -9,6 +9,7 @@ import java.io.PrintStream;
 
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
+import httpserver.itf.HttpRicmlet;
 import httpserver.itf.HttpRicmletRequest;
 import httpserver.itf.HttpSession;
 
@@ -24,17 +25,15 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	@Override
 	public void process(HttpResponse resp) throws Exception {
         try {
-            String resname = super.getContentType(this.m_ressname);
-            resp.setReplyOk();
-            resp.setContentType(resname);
-            FileInputStream fis = new FileInputStream(this.m_ressname.substring(1));
-            byte b[] = fis.readAllBytes();
-            resp.setContentLength(b.length);
-            PrintStream pt = resp.beginBody();
-            pt.write(b);
-        }catch(FileNotFoundException e){
-            resp.setReplyError(404, "File Not Found");
+        	String clsname = DEFAULT_PATH + this.m_ressname.replace("/", ".").substring(1);
+        	System.out.println(clsname);
+            Class<?> c = Class.forName(clsname);
+            HttpRicmlet ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
+            ricmlet.doGet(this, (HttpRicmletResponseImpl)resp);
+        } catch(ClassNotFoundException e) {
+        	e.printStackTrace();
         }
+            
 
     }
 
