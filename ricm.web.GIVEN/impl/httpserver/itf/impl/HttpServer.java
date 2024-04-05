@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
@@ -62,9 +63,16 @@ public class HttpServer {
     	HttpRicmlet ricmlet = ricmlets.get(clsname);
     	if(ricmlet == null) {
     		
-    		Class<?> c = Class.forName(clsname);    		
+    		Application app = new Application();
+    		String split[] = clsname.split("\\.");
+    		String appName = split[1];
+    		System.out.println(appName);
+
+    		clsname = split[2];
+    		System.out.println(clsname);
+
     		
-            ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
+    		ricmlet = app.getInstance("CountBySessionRicmlet", "countApp", ClassLoader.getSystemClassLoader());    		
             ricmlets.put(clsname, ricmlet);
     	}
     	

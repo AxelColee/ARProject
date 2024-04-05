@@ -45,7 +45,9 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	@Override
 	public void process(HttpResponse resp) throws Exception {
        
-        	String clsname = this.path.replace("/", ".").substring(1).split("ricmlets.")[1];
+        	//String clsname = this.path.replace("/", ".").substring(1).split("ricmlets.")[1];
+        	String clsname = this.path.replace("/", ".").substring(1);
+
         	this.m_hs.getInstance(clsname).doGet(this, (HttpRicmletResponseImpl)resp);
     }
 
