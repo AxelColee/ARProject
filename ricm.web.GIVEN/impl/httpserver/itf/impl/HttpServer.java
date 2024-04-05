@@ -99,10 +99,17 @@ public class HttpServer {
 		String method = parseline.nextToken().toUpperCase(); 
 		String ressname = parseline.nextToken();
 		this.getCookiesFromHeader(br);
+		if(!cookies.containsKey("session-id")) {
+			Session s = Session.getInstance(null);
+			cookies.put("session-id",s.getId());
+		}
 
 		if (method.equals("GET")) {
-			//request = new HttpStaticRequest(this, method, ressname);
-			request = new HttpRicmletRequestImpl(this, method, ressname, br);
+			if(ressname.contains("ricmlets")) {
+				request = new HttpRicmletRequestImpl(this, method, ressname, br);
+			}else {
+				request = new HttpStaticRequest(this, method, ressname);
+			}
 		} else 
 			request = new UnknownRequest(this, method, ressname);
 		
@@ -114,8 +121,10 @@ public class HttpServer {
 	 * Returns an HttpResponse object associated to the given HttpRequest object
 	 */
 	public HttpResponse getResponse(HttpRequest req, PrintStream ps) {
-		//return new HttpResponseImpl(this, req, ps);
-		return new HttpRicmletResponseImpl(this, req, ps);
+		if(req instanceof HttpRicmletRequestImpl) {
+			return new HttpRicmletResponseImpl(this, req, ps);
+		}
+		return new HttpResponseImpl(this, req, ps);
 	}
 
 

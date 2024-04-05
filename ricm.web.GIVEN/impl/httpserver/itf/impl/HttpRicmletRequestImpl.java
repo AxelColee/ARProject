@@ -72,8 +72,8 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 
 	@Override
 	public HttpSession getSession() {
-		// TODO Auto-generated method stub
-		return null;
+		String id = getCookie("session-id");
+		return Session.getInstance(id);
 	}
 
 	@Override

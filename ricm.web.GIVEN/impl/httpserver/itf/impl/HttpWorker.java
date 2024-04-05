@@ -34,6 +34,7 @@ public class HttpWorker extends Thread {
 			// process the HTTP request
 			req.process(resp);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("Server exception, skipping to next request " + e);		
 		} finally {
 			try {
