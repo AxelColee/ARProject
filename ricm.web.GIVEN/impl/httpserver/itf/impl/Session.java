@@ -18,13 +18,18 @@ public class Session implements HttpSession{
 		content = new HashMap<>();
 	}
 	
+	private Session(String id) {
+		this.id = id;
+		content = new HashMap<>();
+	}
+	
 	public static Session getInstance(String id) {
-		if(id == null) {
-			Session s = new Session();
-			sessions.put(s.getId(), s);
-			return s;
+		Session result = sessions.get(id);
+		if(id == null || result == null) {
+			 result = new Session(id);
+			sessions.put(result.getId(), result);
 		}
-		return sessions.get(id);
+		return result;
 	}
 	
 	
