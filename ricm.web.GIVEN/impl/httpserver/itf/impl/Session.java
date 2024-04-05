@@ -9,45 +9,22 @@ import httpserver.itf.HttpSession;
 
 public class Session implements HttpSession{
 	
-	private static HashMap<String, Session> sessions = new HashMap<>();
-	
 	public static final int TIME_START = 1000;
 	
 	private String id;
 	private HashMap<String, Object> content;
 	private int timeLeft;
 	
-	private Session() {
+	public Session() {
 		id = Long.toString(Clock.systemDefaultZone().millis());
 		content = new HashMap<>();
 		timeLeft = TIME_START;
 	}
 	
-	private Session(String id) {
+	public Session(String id) {
 		this.id = id;
 		content = new HashMap<>();
 		timeLeft = TIME_START;
-	}
-	
-	public static Session getInstance(String id) {
-		Session result = sessions.get(id);
-		if(id == null || result == null) {
-			 result = new Session(id);
-			sessions.put(result.getId(), result);
-		}
-		ArrayList<String> toRemove = new ArrayList<>();
-		
-		sessions.forEach((key, value) -> {
-			if(key != id) {
-				if(value.update()) toRemove.add(key);
-			}
-		});
-		
-		for(String s : toRemove) {
-			sessions.remove(s);
-		}
-		
-		return result;
 	}
 	
 	

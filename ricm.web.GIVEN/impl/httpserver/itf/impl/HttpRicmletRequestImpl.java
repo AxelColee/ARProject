@@ -18,6 +18,7 @@ import httpserver.itf.HttpSession;
 public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	
 	private String path;
+	private String appName;
 	private String params;
 	private BufferedReader m_br;
 	private HashMap<String, String> values;
@@ -29,6 +30,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
         this.m_br = br;
         String temp[] = this.m_ressname.split("\\?");
         this.path = temp[0];
+        this.appName = path.split("/")[2];
         if(temp.length == 2) {
         	this.params = temp[1];
         	String parse[] = this.params.split("&");
@@ -54,7 +56,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	@Override
 	public HttpSession getSession() {
 		String id = getCookie("session-id");
-		return Session.getInstance(id);
+		return this.m_hs.applications.get(appName).getInstance(id);
 	}
 
 	@Override
@@ -67,10 +69,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 
 	@Override
 	public String getCookie(String name) {
-		return 
-				
-				
-				this.m_hs.getCookies().get(name);
+		return this.m_hs.getCookies().get(name);
 	}
 
 }

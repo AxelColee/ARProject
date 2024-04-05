@@ -33,7 +33,7 @@ public class HttpServer {
 	private ServerSocket m_ssoc;
 	protected HashMap<String, String> cookies;
 
-	protected static HashMap<String, HttpRicmlet> ricmlets = new HashMap<>();
+	public static HashMap<String, Application> applications = new HashMap<>();
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -60,24 +60,17 @@ public class HttpServer {
 	public HttpRicmlet getInstance(String clsname)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-    	HttpRicmlet ricmlet = ricmlets.get(clsname);
-    	if(ricmlet == null) {
     		
-    		Application app = new Application();
     		String split[] = clsname.split("\\.");
     		String appName = split[1];
-    		System.out.println(appName);
+    		Application app = applications.get(appName);
+    		if(app == null) {
+    			app = new Application();
+    			applications.put(appName, app);
+    		}
 
     		clsname = split[2];
-    		System.out.println(clsname);
-
-    		
-    		ricmlet = app.getInstance("CountBySessionRicmlet", "countApp", ClassLoader.getSystemClassLoader());    		
-            ricmlets.put(clsname, ricmlet);
-    	}
-    	
-    	return ricmlet;
-		
+    		return app.getInstance(clsname, appName, ClassLoader.getSystemClassLoader());    		
 	}
 	
 	public void getCookiesFromHeader(BufferedReader br) {
@@ -118,14 +111,15 @@ public class HttpServer {
 		StringTokenizer parseline = new StringTokenizer(startline);
 		String method = parseline.nextToken().toUpperCase(); 
 		String ressname = parseline.nextToken();
-		this.getCookiesFromHeader(br);
-		if(!cookies.containsKey("session-id")) {
-			Session s = Session.getInstance(null);
-			cookies.put("session-id",s.getId());
-		}
 
 		if (method.equals("GET")) {
 			if(ressname.contains("ricmlets")) {
+				this.getCookiesFromHeader(br);
+				if(!cookies.containsKey("session-id")) {
+					String appName = ressname.split("/")[2];
+					Session s = applications.get(appName).getInstance(null);
+					cookies.put("session-id",s.getId());
+				}
 				request = new HttpRicmletRequestImpl(this, method, ressname, br);
 			}else {
 				request = new HttpStaticRequest(this, method, ressname);
