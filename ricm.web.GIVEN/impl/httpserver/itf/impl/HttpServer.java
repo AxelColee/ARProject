@@ -32,6 +32,8 @@ public class HttpServer {
 	private ServerSocket m_ssoc;
 	protected HashMap<String, String> cookies;
 
+	protected static HashMap<String, HttpRicmlet> ricmlets = new HashMap<>();
+
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
 		if (!folderName.endsWith(File.separator)) 
@@ -57,7 +59,17 @@ public class HttpServer {
 	public HttpRicmlet getInstance(String clsname)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		throw new Error("No Support for Ricmlets");
+    	HttpRicmlet ricmlet = ricmlets.get(clsname);
+    	if(ricmlet == null) {
+    		
+    		Class<?> c = Class.forName(clsname);    		
+    		
+            ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
+            ricmlets.put(clsname, ricmlet);
+    	}
+    	
+    	return ricmlet;
+		
 	}
 	
 	public void getCookiesFromHeader(BufferedReader br) {

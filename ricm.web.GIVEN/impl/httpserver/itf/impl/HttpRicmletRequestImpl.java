@@ -44,30 +44,9 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 
 	@Override
 	public void process(HttpResponse resp) throws Exception {
-        try {
+       
         	String clsname = this.path.replace("/", ".").substring(1).split("ricmlets.")[1];
-        	HttpRicmlet ricmlet = ricmlets.get(clsname);
-        	if(ricmlet == null) {
-        		
-        		Class<?> c = Class.forName(clsname);
-                
-        		String line = this.m_br.readLine();
-        		while(line != null) {
-        			System.out.println(line);
-        			line = this.m_br.readLine();
-        		}
-        		
-        		
-                ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
-                ricmlets.put(clsname, ricmlet);
-        	}
-        	
-            ricmlet.doGet(this, (HttpRicmletResponseImpl)resp);
-        } catch(ClassNotFoundException e) {
-        	e.printStackTrace();
-        }
-            
-
+        	this.m_hs.getInstance(clsname).doGet(this, (HttpRicmletResponseImpl)resp);
     }
 
 	@Override
