@@ -20,10 +20,12 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	private String path;
 	private String params;
 	private HashMap<String, String> values;
+	private static HashMap<String, HttpRicmlet> ricmlets = new HashMap<>();
 	static final String DEFAULT_PATH = "ricm.web.GIVEN/";
 	
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
         super(hs, method, ressname, br);
+        System.out.println("test");
         String temp[] = this.m_ressname.split("\\?");
         this.path = temp[0];
         if(temp.length == 2) {
@@ -35,18 +37,23 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
             	values.put(temporary[0], temporary[1]);
             }
         }
+        
+        
     }
 
 	@Override
 	public void process(HttpResponse resp) throws Exception {
         try {
         	String clsname = this.path.replace("/", ".").substring(1).split("ricmlets.")[1];
+        	HttpRicmlet ricmlet = ricmlets.get(clsname);
+        	if(ricmlet == null) {
+        		System.out.println("hola");
+        		Class<?> c = Class.forName(clsname);
+                
+                ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
+                ricmlets.put(clsname, ricmlet);
+        	}
         	
-        	System.out.println(this.params);
-        	
-            Class<?> c = Class.forName(clsname);
-            
-            HttpRicmlet ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
             ricmlet.doGet(this, (HttpRicmletResponseImpl)resp);
         } catch(ClassNotFoundException e) {
         	e.printStackTrace();
