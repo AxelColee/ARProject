@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
@@ -29,6 +30,7 @@ public class HttpServer {
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
+	protected HashMap<String, String> cookies;
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -42,6 +44,8 @@ public class HttpServer {
 			System.out.println("HttpServer Exception:" + e );
 			System.exit(1);
 		}
+		
+		cookies = new HashMap<>();
 	}
 	
 	public File getFolder() {
@@ -54,6 +58,31 @@ public class HttpServer {
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		throw new Error("No Support for Ricmlets");
+	}
+	
+	public void getCookiesFromHeader(BufferedReader br) {
+		try {
+			String line = br.readLine();
+			while(!line.equals("") ) {
+				if(line.contains("Cookie")) {
+					//Set-Cookie: myFirstCookie=123;mySecondCookie=Hello
+					String parseColone = line.split(":")[1];
+					String parseSemiColon[] = parseColone.split(";");
+					for(int i = 0;i < parseSemiColon.length; i++) {
+						String parameters[] = parseSemiColon[i].trim().split("=");
+						cookies.put(parameters[0], parameters[1]);
+					}
+				}
+				line = br.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public HashMap<String, String> getCookies(){
+		return this.cookies;
 	}
 
 
@@ -69,11 +98,14 @@ public class HttpServer {
 		StringTokenizer parseline = new StringTokenizer(startline);
 		String method = parseline.nextToken().toUpperCase(); 
 		String ressname = parseline.nextToken();
+		this.getCookiesFromHeader(br);
+
 		if (method.equals("GET")) {
 			//request = new HttpStaticRequest(this, method, ressname);
 			request = new HttpRicmletRequestImpl(this, method, ressname, br);
 		} else 
 			request = new UnknownRequest(this, method, ressname);
+		
 		return request;
 	}
 

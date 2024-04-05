@@ -19,13 +19,14 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	
 	private String path;
 	private String params;
+	private BufferedReader m_br;
 	private HashMap<String, String> values;
 	private static HashMap<String, HttpRicmlet> ricmlets = new HashMap<>();
 	static final String DEFAULT_PATH = "ricm.web.GIVEN/";
 	
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
         super(hs, method, ressname, br);
-        System.out.println("test");
+        this.m_br = br;
         String temp[] = this.m_ressname.split("\\?");
         this.path = temp[0];
         if(temp.length == 2) {
@@ -47,9 +48,16 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
         	String clsname = this.path.replace("/", ".").substring(1).split("ricmlets.")[1];
         	HttpRicmlet ricmlet = ricmlets.get(clsname);
         	if(ricmlet == null) {
-        		System.out.println("hola");
+        		
         		Class<?> c = Class.forName(clsname);
                 
+        		String line = this.m_br.readLine();
+        		while(line != null) {
+        			System.out.println(line);
+        			line = this.m_br.readLine();
+        		}
+        		
+        		
                 ricmlet = (HttpRicmlet) c.getDeclaredConstructor().newInstance();
                 ricmlets.put(clsname, ricmlet);
         	}
@@ -78,8 +86,10 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 
 	@Override
 	public String getCookie(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return 
+				
+				
+				this.m_hs.getCookies().get(name);
 	}
 
 }
