@@ -82,7 +82,8 @@ public class HttpServer {
 	 * Returns an HttpResponse object associated to the given HttpRequest object
 	 */
 	public HttpResponse getResponse(HttpRequest req, PrintStream ps) {
-		return new HttpResponseImpl(this, req, ps);
+		//return new HttpResponseImpl(this, req, ps);
+		return new HttpRicmletResponseImpl(this, req, ps);
 	}
 
 
