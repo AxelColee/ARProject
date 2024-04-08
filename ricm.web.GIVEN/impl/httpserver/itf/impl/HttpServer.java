@@ -55,6 +55,15 @@ public class HttpServer {
 		return m_folder;
 	}
 	
+	public Application getApplication(String name) {
+		Application app = applications.get(name);
+		if(app == null) {
+			app = new Application();
+			applications.put(name, app);
+		}
+		return app;
+	}
+	
 	
 
 	public HttpRicmlet getInstance(String clsname)
@@ -63,11 +72,7 @@ public class HttpServer {
     		
     		String split[] = clsname.split("\\.");
     		String appName = split[1];
-    		Application app = applications.get(appName);
-    		if(app == null) {
-    			app = new Application();
-    			applications.put(appName, app);
-    		}
+    		Application app = this.getApplication(appName);
 
     		clsname = split[2];
     		return app.getInstance(clsname, appName, ClassLoader.getSystemClassLoader());    		
@@ -117,7 +122,7 @@ public class HttpServer {
 				this.getCookiesFromHeader(br);
 				if(!cookies.containsKey("session-id")) {
 					String appName = ressname.split("/")[2];
-					Session s = applications.get(appName).getInstance(null);
+					Session s = this.getApplication(appName).getInstance(null);
 					cookies.put("session-id",s.getId());
 				}
 				request = new HttpRicmletRequestImpl(this, method, ressname, br);
